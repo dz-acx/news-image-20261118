@@ -1,70 +1,463 @@
 import os
-import struct
 import sys
+import struct
 import zlib
 
 WIDTH = 1024
 HEIGHT = 1024
 
-COLOR_PAPER = (0xF7, 0xF3, 0xE9)
-COLOR_INK = (0x14, 0x14, 0x14)
-COLOR_RED = (0xB3, 0x20, 0x2C)
-COLOR_BLUE = (0x1D, 0x4E, 0x89)
-COLOR_GRAY = (0x5A, 0x5A, 0x5A)
+COLOR_PAPER = (247, 243, 233)
+COLOR_INK = (20, 20, 20)
+COLOR_RED = (179, 32, 44)
+COLOR_BLUE = (29, 78, 137)
+COLOR_GRAY = (90, 90, 90)
 
 FONT = {
-    'A': ".###.\n#...#\n#...#\n#####\n#...#\n#...#\n#...#",
-    'B': "####.\n#...#\n#...#\n####.\n#...#\n#...#\n####.",
-    'C': ".####\n#....\n#....\n#....\n#....\n#....\n.####",
-    'D': "####.\n#...#\n#...#\n#...#\n#...#\n#...#\n####.",
-    'E': "#####\n#....\n#....\n####.\n#....\n#....\n#####",
-    'F': "#####\n#....\n#....\n####.\n#....\n#....\n#....",
-    'G': ".####\n#....\n#....\n#.###\n#...#\n#...#\n.####",
-    'H': "#...#\n#...#\n#...#\n#####\n#...#\n#...#\n#...#",
-    'I': "#####\n..#..\n..#..\n..#..\n..#..\n..#..\n#####",
-    'J': "..###\n...#.\n...#.\n...#.\n#..#.\n#..#.\n.##..",
-    'K': "#...#\n#..#.\n#.#..\n##...\n#.#..\n#..#.\n#...#",
-    'L': "#....\n#....\n#....\n#....\n#....\n#....\n#####",
-    'M': "#...#\n##.##\n#.#.#\n#...#\n#...#\n#...#\n#...#",
-    'N': "#...#\n##..#\n#.#.#\n#..##\n#...#\n#...#\n#...#",
-    'O': ".###.\n#...#\n#...#\n#...#\n#...#\n#...#\n.###.",
-    'P': "####.\n#...#\n#...#\n####.\n#....\n#....\n#....",
-    'Q': ".###.\n#...#\n#...#\n#...#\n#.#.#\n#..#.\n.##.#",
-    'R': "####.\n#...#\n#...#\n####.\n#.#..\n#..#.\n#...#",
-    'S': ".####\n#....\n#....\n.###.\n....#\n....#\n####.",
-    'T': "#####\n..#..\n..#..\n..#..\n..#..\n..#..\n..#..",
-    'U': "#...#\n#...#\n#...#\n#...#\n#...#\n#...#\n.###.",
-    'V': "#...#\n#...#\n#...#\n#...#\n#...#\n.#.#.\n..#..",
-    'W': "#...#\n#...#\n#...#\n#.#.#\n#.#.#\n##.##\n#...#",
-    'X': "#...#\n#...#\n.#.#.\n..#..\n.#.#.\n#...#\n#...#",
-    'Y': "#...#\n#...#\n.#.#.\n..#..\n..#..\n..#..\n..#..",
-    'Z': "#####\n....#\n...#.\n..#..\n.#...\n#....\n#####",
-    '0': ".###.\n#..##\n#.#.#\n#.#.#\n##..#\n#...#\n.###.",
-    '1': "..#..\n.##..\n..#..\n..#..\n..#..\n..#..\n.###.",
-    '2': ".###.\n#...#\n....#\n..##.\n.#...\n#....\n#####",
-    '3': "####.\n....#\n....#\n.###.\n....#\n....#\n####.",
-    '4': "#...#\n#...#\n#...#\n#####\n....#\n....#\n....#",
-    '5': "#####\n#....\n####.\n....#\n....#\n#...#\n.###.",
-    '6': ".###.\n#....\n####.\n#...#\n#...#\n#...#\n.###.",
-    '7': "#####\n....#\n...#.\n..#..\n..#..\n..#..\n..#..",
-    '8': ".###.\n#...#\n#...#\n.###.\n#...#\n#...#\n.###.",
-    '9': ".###.\n#...#\n#...#\n.####\n....#\n....#\n.###.",
-    '.': ".....\n.....\n.....\n.....\n.....\n.##..\n.##..",
-    ',': ".....\n.....\n.....\n.....\n.##..\n..#..\n.#...",
-    "'": ".##..\n.##..\n..#..\n.....\n.....\n.....\n.....",
-    '-': ".....\n.....\n.....\n#####\n.....\n.....\n.....",
-    ':': ".....\n.##..\n.##..\n.....\n.##..\n.##..\n.....",
-    '/': "....#\n...#.\n..#..\n..#..\n.#...\n#....\n.....",
-    '%': "##..#\n##.#.\n...#.\n..#..\n.#...\n.#.##\n#..##",
-    '$': "..#..\n.####\n#.#..\n.###.\n..#.#\n####.\n..#..",
-    '+': ".....\n..#..\n..#..\n#####\n..#..\n..#..\n.....",
-    '(': "...#.\n..#..\n.#...\n.#...\n.#...\n..#..\n...#.",
-    ')': ".#...\n..#..\n...#.\n...#.\n...#.\n..#..\n.#...",
-    '!': "..#..\n..#..\n..#..\n..#..\n.....\n..#..\n..#..",
-    ' ': ".....\n.....\n.....\n.....\n.....\n.....\n.....",
+    ' ': [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+    ],
+    'A': [
+        ".###.",
+        "#...#",
+        "#...#",
+        "#####",
+        "#...#",
+        "#...#",
+        "#...#",
+    ],
+    'B': [
+        "####.",
+        "#...#",
+        "#...#",
+        "####.",
+        "#...#",
+        "#...#",
+        "####.",
+    ],
+    'C': [
+        ".####",
+        "#....",
+        "#....",
+        "#....",
+        "#....",
+        "#....",
+        ".####",
+    ],
+    'D': [
+        "####.",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "####.",
+    ],
+    'E': [
+        "#####",
+        "#....",
+        "#....",
+        "####.",
+        "#....",
+        "#....",
+        "#####",
+    ],
+    'F': [
+        "#####",
+        "#....",
+        "#....",
+        "####.",
+        "#....",
+        "#....",
+        "#....",
+    ],
+    'G': [
+        ".####",
+        "#....",
+        "#....",
+        "#.###",
+        "#...#",
+        "#...#",
+        ".####",
+    ],
+    'H': [
+        "#...#",
+        "#...#",
+        "#...#",
+        "#####",
+        "#...#",
+        "#...#",
+        "#...#",
+    ],
+    'I': [
+        "#####",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        "#####",
+    ],
+    'J': [
+        "..###",
+        "....#",
+        "....#",
+        "....#",
+        "#...#",
+        "#...#",
+        ".###.",
+    ],
+    'K': [
+        "#...#",
+        "#..#.",
+        "#.#..",
+        "##...",
+        "#.#..",
+        "#..#.",
+        "#...#",
+    ],
+    'L': [
+        "#....",
+        "#....",
+        "#....",
+        "#....",
+        "#....",
+        "#....",
+        "#####",
+    ],
+    'M': [
+        "#...#",
+        "##.##",
+        "#.#.#",
+        "#.#.#",
+        "#...#",
+        "#...#",
+        "#...#",
+    ],
+    'N': [
+        "#...#",
+        "##..#",
+        "#.#.#",
+        "#..##",
+        "#...#",
+        "#...#",
+        "#...#",
+    ],
+    'O': [
+        ".###.",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        ".###.",
+    ],
+    'P': [
+        "####.",
+        "#...#",
+        "#...#",
+        "####.",
+        "#....",
+        "#....",
+        "#....",
+    ],
+    'Q': [
+        ".###.",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#.#.#",
+        "#..#.",
+        ".##.#",
+    ],
+    'R': [
+        "####.",
+        "#...#",
+        "#...#",
+        "####.",
+        "#.#..",
+        "#..#.",
+        "#...#",
+    ],
+    'S': [
+        ".####",
+        "#....",
+        "#....",
+        ".###.",
+        "....#",
+        "....#",
+        "####.",
+    ],
+    'T': [
+        "#####",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+    ],
+    'U': [
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        ".###.",
+    ],
+    'V': [
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#...#",
+        ".#.#.",
+        "..#..",
+    ],
+    'W': [
+        "#...#",
+        "#...#",
+        "#...#",
+        "#.#.#",
+        "#.#.#",
+        "##.##",
+        "#...#",
+    ],
+    'X': [
+        "#...#",
+        "#...#",
+        ".#.#.",
+        "..#..",
+        ".#.#.",
+        "#...#",
+        "#...#",
+    ],
+    'Y': [
+        "#...#",
+        "#...#",
+        ".#.#.",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+    ],
+    'Z': [
+        "#####",
+        "....#",
+        "...#.",
+        "..#..",
+        ".#...",
+        "#....",
+        "#####",
+    ],
+    '0': [
+        ".###.",
+        "#...#",
+        "#..##",
+        "#.#.#",
+        "##..#",
+        "#...#",
+        ".###.",
+    ],
+    '1': [
+        "..#..",
+        ".##..",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        ".###.",
+    ],
+    '2': [
+        ".###.",
+        "#...#",
+        "....#",
+        "..##.",
+        ".#...",
+        "#....",
+        "#####",
+    ],
+    '3': [
+        "####.",
+        "....#",
+        "....#",
+        ".###.",
+        "....#",
+        "....#",
+        "####.",
+    ],
+    '4': [
+        "#...#",
+        "#...#",
+        "#...#",
+        "#####",
+        "....#",
+        "....#",
+        "....#",
+    ],
+    '5': [
+        "#####",
+        "#....",
+        "####.",
+        "....#",
+        "....#",
+        "....#",
+        "####.",
+    ],
+    '6': [
+        ".###.",
+        "#....",
+        "####.",
+        "#...#",
+        "#...#",
+        "#...#",
+        ".###.",
+    ],
+    '7': [
+        "#####",
+        "....#",
+        "...#.",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+    ],
+    '8': [
+        ".###.",
+        "#...#",
+        "#...#",
+        ".###.",
+        "#...#",
+        "#...#",
+        ".###.",
+    ],
+    '9': [
+        ".###.",
+        "#...#",
+        "#...#",
+        ".####",
+        "....#",
+        "....#",
+        ".###.",
+    ],
+    '.': [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".##..",
+        ".##..",
+    ],
+    ',': [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".##..",
+        "..#..",
+        ".#...",
+    ],
+    "'": [
+        ".##..",
+        ".##..",
+        "..#..",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+    ],
+    '-': [
+        ".....",
+        ".....",
+        ".....",
+        "#####",
+        ".....",
+        ".....",
+        ".....",
+    ],
+    ':': [
+        ".....",
+        ".##..",
+        ".##..",
+        ".....",
+        ".##..",
+        ".##..",
+        ".....",
+    ],
+    '/': [
+        "....#",
+        "...#.",
+        "...#.",
+        "..#..",
+        ".#...",
+        ".#...",
+        "#....",
+    ],
+    '%': [
+        "##..#",
+        "##.#.",
+        "...#.",
+        "..#..",
+        ".#...",
+        ".#.##",
+        "#..##",
+    ],
+    '$': [
+        "..#..",
+        ".####",
+        "#.#..",
+        ".###.",
+        "..#.#",
+        "####.",
+        "..#..",
+    ],
+    '+': [
+        ".....",
+        "..#..",
+        "..#..",
+        "#####",
+        "..#..",
+        "..#..",
+        ".....",
+    ],
+    '(': [
+        "...#.",
+        "..#..",
+        ".#...",
+        ".#...",
+        ".#...",
+        "..#..",
+        "...#.",
+    ],
+    ')': [
+        ".#...",
+        "..#..",
+        "...#.",
+        "...#.",
+        "...#.",
+        "..#..",
+        ".#...",
+    ],
+    '!': [
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        "..#..",
+        ".....",
+        "..#..",
+    ],
 }
 
 pixels = bytearray(bytes(COLOR_PAPER) * (WIDTH * HEIGHT))
+
 
 def fill_rect(x, y, w, h, color):
     x0 = max(0, x)
@@ -73,43 +466,43 @@ def fill_rect(x, y, w, h, color):
     y1 = min(HEIGHT, y + h)
     if x1 <= x0 or y1 <= y0:
         return
-    c_bytes = bytes(color)
-    span_len = x1 - x0
-    row_bytes = c_bytes * span_len
+    r, g, b = color
+    row_bytes = bytes([r, g, b]) * (x1 - x0)
     for py in range(y0, y1):
-        idx0 = (py * WIDTH + x0) * 3
-        idx1 = idx0 + span_len * 3
-        pixels[idx0:idx1] = row_bytes
+        idx = (py * WIDTH + x0) * 3
+        pixels[idx:idx + len(row_bytes)] = row_bytes
 
-def stroke_rect(x, y, w, h, thickness, color):
+
+def draw_rect(x, y, w, h, thickness, color):
     fill_rect(x, y, w, thickness, color)
     fill_rect(x, y + h - thickness, w, thickness, color)
     fill_rect(x, y, thickness, h, color)
     fill_rect(x + w - thickness, y, thickness, h, color)
 
+
+def text(x, y, s, scale, color):
+    s = s.upper()
+    cur_x = x
+    blank_glyph = ["....."] * 7
+    for ch in s:
+        glyph = FONT.get(ch, blank_glyph)
+        for row_idx, row_str in enumerate(glyph):
+            py = y + row_idx * scale
+            for col_idx, col_char in enumerate(row_str):
+                if col_char == '#':
+                    px = cur_x + col_idx * scale
+                    fill_rect(px, py, scale, scale, color)
+        cur_x += 6 * scale
+
+
+def text_width(s, scale):
+    if not s:
+        return 0
+    return (len(s) - 1) * (6 * scale) + (5 * scale)
+
+
 def wrap(s, maxchars):
-    if isinstance(s, (list, tuple)):
-        lines = []
-        for item in s:
-            lines.extend(wrap(item, maxchars))
-        return lines
-    if '\n' in s:
-        parts = s.split('\n')
-    elif ' / ' in s:
-        parts = s.split(' / ')
-    else:
-        parts = None
-
-    if parts is not None:
-        lines = []
-        for p in parts:
-            if len(p) <= maxchars or len(parts) > 1:
-                lines.append(p)
-            else:
-                lines.extend(wrap(p, maxchars))
-        return lines
-
-    words = s.split()
+    words = s.split(' ')
     lines = []
     cur = []
     cur_len = 0
@@ -128,157 +521,142 @@ def wrap(s, maxchars):
         lines.append(" ".join(cur))
     return lines
 
-def text(x, y, s, scale, color, max_x=WIDTH, spacing=None):
-    if spacing is None:
-        spacing = 1 * scale
-    cx = x
-    for ch in s:
-        glyph = FONT.get(ch, FONT[' '])
-        lines = glyph.splitlines()
-        for r, row in enumerate(lines):
-            py = y + r * scale
-            for c, bit in enumerate(row):
-                if bit == '#':
-                    px = cx + c * scale
-                    if px + scale <= max_x:
-                        fill_rect(px, py, scale, scale, color)
-        cx += 5 * scale + spacing
+
+def make_png(width, height, raw_rgb):
+    scanlines = bytearray()
+    row_bytes_len = width * 3
+    for y in range(height):
+        scanlines.append(0)
+        start = y * row_bytes_len
+        scanlines.extend(raw_rgb[start:start + row_bytes_len])
+
+    compressed = zlib.compress(scanlines, level=6)
+
+    def chunk(chunk_type, data):
+        length = len(data)
+        crc = zlib.crc32(chunk_type + data) & 0xFFFFFFFF
+        return struct.pack(">I", length) + chunk_type + data + struct.pack(">I", crc)
+
+    png = bytearray(b"\x89PNG\r\n\x1a\n")
+    ihdr_data = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    png.extend(chunk(b"IHDR", ihdr_data))
+    png.extend(chunk(b"IDAT", compressed))
+    png.extend(chunk(b"IEND", b""))
+    return bytes(png)
+
 
 def render():
-    global pixels
-    pixels = bytearray(bytes(COLOR_PAPER) * (WIDTH * HEIGHT))
     # 1. Pita atas
-    header_text = "THE WORLD IN ONE DAY"
-    char_adv_8 = 6 * 8
-    hdr_w = (len(header_text) - 1) * char_adv_8 + 5 * 8
-    hdr_x = (WIDTH - hdr_w) // 2
-    text(hdr_x, 26, header_text, 8, COLOR_INK)
+    title_text = "THE WORLD IN ONE DAY"
+    title_w = text_width(title_text, 8)
+    title_x = (WIDTH - title_w) // 2
+    text(title_x, 24, title_text, 8, COLOR_INK)
 
-    # Garis tebal di bawah pita atas
-    fill_rect(36, 88, 952, 4, COLOR_INK)
+    # Garis tebal bawah judul
+    fill_rect(32, 86, 960, 4, COLOR_INK)
 
-    # Tanggal pita atas
+    # Tanggal
     date_text = "WEDNESDAY 18 NOVEMBER 2026"
-    char_adv_6 = 6 * 6
-    date_w = (len(date_text) - 1) * char_adv_6 + 5 * 6
+    date_w = text_width(date_text, 6)
     date_x = (WIDTH - date_w) // 2
-    text(date_x, 100, date_text, 6, COLOR_RED)
+    text(date_x, 96, date_text, 6, COLOR_RED)
+
+    # Garis pembatas atas panel utama
+    fill_rect(32, 144, 960, 2, COLOR_INK)
 
     # 2. Panel UTAMA (kotak merah tipis)
-    panel_x = 36
+    panel_x = 32
     panel_y = 152
-    panel_w = 952
-    panel_h = 196
-    stroke_rect(panel_x, panel_y, panel_w, panel_h, 2, COLOR_RED)
+    panel_w = 960
+    panel_h = 208
+    draw_rect(panel_x, panel_y, panel_w, panel_h, 2, COLOR_RED)
 
-    # Judul utama (scale 6, 2 baris)
     main_title = "US AND IRAN TRADE STRIKES ACROSS THE GULF"
-    title_lines = wrap(main_title, 26)
-    for i, line in enumerate(title_lines[:2]):
-        text(panel_x + 16, panel_y + 14 + i * 44, line, 6, COLOR_INK)
+    main_title_lines = wrap(main_title, 26)
+    line1 = main_title_lines[0]
+    line2 = main_title_lines[1]
+    w1 = text_width(line1, 6)
+    w2 = text_width(line2, 6)
+    text(panel_x + (panel_w - w1) // 2, 162, line1, 6, COLOR_INK)
+    text(panel_x + (panel_w - w2) // 2, 208, line2, 6, COLOR_INK)
 
-    # 3 baris ringkas (scale 3)
+    # Garis pemisah tipis dalam panel
+    fill_rect(panel_x + 20, 258, panel_w - 40, 1, COLOR_RED)
+
+    # 3 baris ringkas
     summary_lines = [
         "US JETS HIT IRGC LAUNCH SITE ON QESHM ISLAND",
         "KUWAIT AND BAHRAIN INTERCEPT IRANIAN DRONES",
-        "TARA GAS TANKER HIT NEAR HORMUZ - 1 SAILOR MISSING"
+        "TARA GAS TANKER HIT NEAR HORMUZ - 1 SAILOR MISSING",
     ]
-    for i, line in enumerate(summary_lines):
-        text(panel_x + 16, panel_y + 112 + i * 26, line, 3, COLOR_INK)
+    for idx, s_line in enumerate(summary_lines):
+        sw = text_width(s_line, 3)
+        sx = panel_x + (panel_w - sw) // 2
+        sy = 268 + idx * 26
+        text(sx, sy, s_line, 3, COLOR_INK)
 
     # 3. Kisi 3 kolom x 4 baris kartu cerita
     cards = [
-        ("EUROPE", "NORWAY RISK / RISING", "EXTREMIST THREAT / LEVEL STAYS 3 OF 5"),
-        ("ASIA", "XI OPENS APEC / IN SHENZHEN", "CALLS FOR / OPEN TRADE"),
-        ("ASIA", "TRUMP XI PUTIN / TO MEET", "SUMMIT WEEK / IN SHENZHEN"),
-        ("AMERICAS", "PELTOLA WINS / ALASKA RACE", "DEMOCRATS TAKE / SENATE 56-44"),
-        ("MARKETS", "NVIDIA BEATS / FORECASTS", "ASIA STOCKS SNAP / LOSING STREAK"),
-        ("MARKETS", "ANTHROPIC TO / MARKET DEBUT", "VALUE COULD HIT / $1.4 TRILLION"),
-        ("ASIA", "ASEAN SEA CODE / NEARLY DONE", "80% AGREED / TARGET NEXT YEAR"),
-        ("ASIA", "THAILAND SEEKS / TARIFF CUT", "12.5% TO 10% / US DEAL TALKS"),
-        ("AFRICA", "UN: 2,230 DEAD / IN SUDAN", "MOST KILLED BY / DRONE STRIKES"),
-        ("AFRICA", "UGANDA RAIL / $2.97BN DEAL", "FUNDING CLOSE / SET JAN 2027"),
-        ("CLIMATE", "ISLAND STATES / PRESS COP31", "DEMAND STRONGER / CLIMATE FINANCE"),
-        ("SCIENCE", "VOYAGER 1 AT / 1 LIGHT-DAY", "SIGNAL TAKES / 24 HOURS - NASA"),
+        ("EUROPE", ["NORWAY RISK", "RISING"], ["EXTREMIST THREAT", "LEVEL STAYS 3 OF 5"]),
+        ("ASIA", ["XI OPENS APEC", "IN SHENZHEN"], ["CALLS FOR", "OPEN TRADE"]),
+        ("ASIA", ["TRUMP XI PUTIN", "TO MEET"], ["SUMMIT WEEK", "IN SHENZHEN"]),
+        ("AMERICAS", ["PELTOLA WINS", "ALASKA RACE"], ["DEMOCRATS TAKE", "SENATE 56-44"]),
+        ("MARKETS", ["NVIDIA BEATS", "FORECASTS"], ["ASIA STOCKS SNAP", "LOSING STREAK"]),
+        ("MARKETS", ["ANTHROPIC TO", "MARKET DEBUT"], ["VALUE COULD HIT", "$1.4 TRILLION"]),
+        ("ASIA", ["ASEAN SEA CODE", "NEARLY DONE"], ["80% AGREED", "TARGET NEXT YEAR"]),
+        ("ASIA", ["THAILAND SEEKS", "TARIFF CUT"], ["12.5% TO 10%", "US DEAL TALKS"]),
+        ("AFRICA", ["UN: 2,230 DEAD", "IN SUDAN"], ["MOST KILLED BY", "DRONE STRIKES"]),
+        ("AFRICA", ["UGANDA RAIL", "$2.97BN DEAL"], ["FUNDING CLOSE", "SET JAN 2027"]),
+        ("CLIMATE", ["ISLAND STATES", "PRESS COP31"], ["DEMAND STRONGER", "CLIMATE FINANCE"]),
+        ("SCIENCE", ["VOYAGER 1 AT", "1 LIGHT-DAY"], ["SIGNAL TAKES", "24 HOURS - NASA"]),
     ]
 
-    grid_y = 362
-    grid_h = 600
-    row_h = grid_h // 4
-    col_w = panel_w // 3
+    col_xs = [10, 346, 682]
+    row_ys = [372, 522, 672, 822]
 
     # Garis pemisah vertikal antar kolom kartu
-    for c in range(1, 3):
-        vx = panel_x + c * col_w - 4
-        fill_rect(vx, grid_y, 1, grid_h, COLOR_GRAY)
+    fill_rect(344, 370, 1, 596, COLOR_GRAY)
+    fill_rect(680, 370, 1, 596, COLOR_GRAY)
 
     # Garis pemisah horizontal antar baris kartu
-    for r in range(1, 4):
-        hy = grid_y + r * row_h - 4
-        fill_rect(panel_x, hy, panel_w, 1, COLOR_GRAY)
+    fill_rect(10, 517, 1004, 1, COLOR_GRAY)
+    fill_rect(10, 667, 1004, 1, COLOR_GRAY)
+    fill_rect(10, 817, 1004, 1, COLOR_GRAY)
 
-    for idx, (section, title, detail) in enumerate(cards):
-        r = idx // 3
-        c = idx % 3
-        cx = panel_x + c * col_w
-        cy = grid_y + r * row_h
-        clip_right = cx + col_w - 5 if c < 2 else panel_x + panel_w - 1
+    for index, (section, title_pair, detail_pair) in enumerate(cards):
+        r = index // 3
+        c = index % 3
+        cx = col_xs[c]
+        cy = row_ys[r]
 
-        # Label seksi kecil (scale 3, biru)
-        text(cx + 6, cy + 6, section, 3, COLOR_BLUE, clip_right)
+        # Label seksi
+        text(cx, cy, section, 3, COLOR_BLUE)
 
-        # Judul (scale 4, hitam, maks 2 baris)
-        lines = wrap(title, 13)
-        for li, line in enumerate(lines[:2]):
-            sp = 2 if len(line) >= 14 else (3 if len(line) == 13 else 4)
-            text(cx + 6, cy + 30 + li * 32, line, 4, COLOR_INK, clip_right, spacing=sp)
+        # Judul kartu (scale 4, hitam)
+        text(cx, cy + 27, title_pair[0], 4, COLOR_INK)
+        text(cx, cy + 59, title_pair[1], 4, COLOR_INK)
 
-        # Detail (scale 3, abu, maks 2 baris)
-        detail_lines = wrap(detail, 18)
-        for di, line in enumerate(detail_lines[:2]):
-            sp = 2 if len(line) >= 18 else 3
-            text(cx + 6, cy + 96 + di * 24, line, 3, COLOR_GRAY, clip_right, spacing=sp)
+        # Detail kartu (scale 3, abu)
+        text(cx, cy + 94, detail_pair[0], 3, COLOR_GRAY)
+        text(cx, cy + 118, detail_pair[1], 3, COLOR_GRAY)
 
     # 4. Kaki gambar
-    fill_rect(panel_x, 972, panel_w, 2, COLOR_INK)
+    fill_rect(32, 976, 960, 2, COLOR_INK)
     footer_text = "SOURCES: REUTERS, AP, BBC, NASA, UN"
-    footer_w = (len(footer_text) - 1) * (6 * 3) + 5 * 3
+    footer_w = text_width(footer_text, 3)
     footer_x = (WIDTH - footer_w) // 2
-    text(footer_x, 984, footer_text, 3, COLOR_INK)
+    text(footer_x, 988, footer_text, 3, COLOR_INK)
 
-def write_png(filepath):
-    raw = bytearray(HEIGHT * (WIDTH * 3 + 1))
-    stride = WIDTH * 3
-    for y in range(HEIGHT):
-        offset_raw = y * (stride + 1)
-        raw[offset_raw] = 0
-        raw[offset_raw + 1 : offset_raw + 1 + stride] = pixels[y * stride : (y + 1) * stride]
-
-    compressed = zlib.compress(raw, level=6)
-
-    def chunk(tag, data):
-        length = struct.pack('>I', len(data))
-        crc = struct.pack('>I', zlib.crc32(tag + data) & 0xFFFFFFFF)
-        return length + tag + data + crc
-
-    ihdr_data = struct.pack('>IIBBBBB', WIDTH, HEIGHT, 8, 2, 0, 0, 0)
-    ihdr = chunk(b'IHDR', ihdr_data)
-    idat = chunk(b'IDAT', compressed)
-    iend = chunk(b'IEND', b'')
-
-    png_data = b'\x89PNG\r\n\x1a\n' + ihdr + idat + iend
-
-    out_dir = os.path.dirname(os.path.abspath(filepath))
-    if out_dir:
-        os.makedirs(out_dir, exist_ok=True)
-    with open(filepath, 'wb') as f:
-        f.write(png_data)
 
 def main():
     render()
+    png_bytes = make_png(WIDTH, HEIGHT, pixels)
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+    os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "entry.png")
-    write_png(out_path)
+    with open(out_path, "wb") as f:
+        f.write(png_bytes)
+
 
 if __name__ == "__main__":
     main()

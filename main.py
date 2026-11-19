@@ -2548,7 +2548,7 @@ MORE_STORIES_DATA = [
     # Kolom 1 (10-24, 15 cerita)
     ("10.", "Voyager 1 reaches one light-day from Earth (NASA)"),
     ("11.", "Bangladesh deploys troops as Hasina return sparks unrest"),
-    ("12.", "Anthropic prices record IPO; $1.4tn valuation in reach"),
+    ("12.", "Anthropic prices record IPO; $1.5tn valuation"),
     ("13.", "U.S. and Venezuela agree to restore military ties"),
     ("14.", "FAA pauses router installs after nationwide ground stop"),
     ("15.", "Jeffries nominated as next U.S. House Speaker"),
@@ -2556,7 +2556,7 @@ MORE_STORIES_DATA = [
     ("17.", "William and Kate meet Modi to end India tour"),
     ("18.", "Critics call GTA 6 \"a masterpiece\""),
     ("19.", "Trump hails \"very big\" Philippines trade deal"),
-    ("20.", "UN court delivers Myanmar genocide verdict"),
+    ("20.", "UN court to rule on Myanmar genocide case Thursday"),
     ("21.", "UK inflation rises to 3.6% on fuel prices"),
     ("22.", "Russian military plane crash kills all 19 aboard"),
     ("23.", "Settler shooting kills Palestinian woman, 72"),
